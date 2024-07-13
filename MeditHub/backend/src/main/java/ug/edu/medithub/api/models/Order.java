@@ -1,5 +1,6 @@
 package ug.edu.medithub.api.models;
 
+import java.util.ArrayList;
 import java.util.UUID;
 
 public class Order {
@@ -10,17 +11,20 @@ public class Order {
     private String time;
     private String description;
 
+    private ArrayList<Tooth> toothArray;
+
     public Order() {
         this.id = UUID.randomUUID().toString();
     }
 
-    public Order(String patientId, String doctorName, String date, String time, String description) {
+    public Order(String patientId, String doctorName, String date, String time, String description, ArrayList<Tooth> toothArray) {
         this();
         this.patientId = patientId;
         this.doctorName = doctorName;
         this.date = date;
         this.time = time;
         this.description = description;
+        this.toothArray = toothArray;
     }
 
     public String getPatientId() {
@@ -67,6 +71,14 @@ public class Order {
         return id;
     }
 
+    public ArrayList<Tooth> getToothArray() {
+        return toothArray;
+    }
+
+    public void setToothArray(ArrayList<Tooth> toothArray) {
+        this.toothArray = toothArray;
+    }
+
     @Override
     public String toString() {
         return "Order{" +
@@ -76,6 +88,7 @@ public class Order {
                 ", date='" + date + '\'' +
                 ", time='" + time + '\'' +
                 ", description='" + description + '\'' +
+                ", toothArray=" + toothArray +
                 '}';
     }
 }

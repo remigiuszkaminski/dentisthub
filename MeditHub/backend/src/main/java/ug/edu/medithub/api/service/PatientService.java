@@ -67,6 +67,7 @@ public class PatientService {
             String date = order.getDate();
             String time = order.getTime();
 
+
             String subject = "Termin wizyty u doktora";
             String text = "Witaj, " + patient.getName() + "!\n\n" +
                     "Przypominamy o nadchodzącej wizycie u doktora " + doctorName + ".\n" +
@@ -77,7 +78,7 @@ public class PatientService {
                     "Pozdrawiamy,\n" +
                     "Zespół MeditHub";
 
-            emailSenderService.sendEmail(patient.getEmail(), subject, text);
+//            emailSenderService.sendEmail(patient.getEmail(), subject, text);
 
             return new ResponseEntity<>("Order added succesfully", HttpStatus.OK);
         } catch (Exception e) {
@@ -108,7 +109,7 @@ public class PatientService {
                     "Pozdrawiamy,\n" +
                     "Zespół MeditHub";
 
-            emailSenderService.sendEmail(patient.getEmail(), subject, text);
+//            emailSenderService.sendEmail(patient.getEmail(), subject, text);
 
             return new ResponseEntity<>("Order deleted succesfully", HttpStatus.OK);
 
