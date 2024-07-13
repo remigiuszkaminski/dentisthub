@@ -104,6 +104,8 @@ export default function PatientsPage({params}: { params: { slug: string } }) {
     const [showAddOrderForm, setShowAddOrderForm] = useState(false);
 
     const [showToothForm, setShowToothForm] = useState(false);
+    const [showSelectedToothOptions, setShowSelectedToothOptions] = useState(false);
+    const [selectedTooth, setSelectedTooth] = useState<Tooth | null>(null);
 
     const { data: session } = useSession();
     const { slug } = params;
@@ -170,6 +172,9 @@ export default function PatientsPage({params}: { params: { slug: string } }) {
     const handleShowToothForm = () => {
         setShowToothForm(!showToothForm);
     }
+
+    
+    
 
     const validationSchema = Yup.object().shape({
         name: Yup.string().required('Name is required'),
@@ -294,13 +299,19 @@ export default function PatientsPage({params}: { params: { slug: string } }) {
                         {showToothForm && (
                             <div className="fixed inset-0 bg-white bg-opacity-90 z-50 flex justify-center items-center">
                                 <div className="relative bg-white p-6 rounded-lg w-1/2 border">
-                                    <button onClick={handleShowToothForm} className="absolute top-2 right-2 text-red-500 text-2xl">X</button>
+                                    <button onClick={handleShowToothForm} className="absolute top-2 right-2 text-red-400 text-2xl border p-2 rounded-lg font-bold hover:bg-gray-200">X</button>
                                     <h2 className="text-xl font-semibold mb-2 text-center">Select Tooth</h2>
                                     <div className="grid grid-cols-8 gap-2">
                                         {newOrder.toothArray.map(tooth => (
                                             <div key={tooth.number} className="flex flex-col items-center">
-                                                <p>{tooth.number}</p>
-                                                <div className="flex">
+
+                                                <button onClick={() => {
+                                                    setShowSelectedToothOptions(true);
+                                                    setSelectedTooth(tooth);
+                                                
+                                                }}>{tooth.number}</button>
+                                                
+                                                {/* <div className="flex">
                                                     <input
                                                         type="checkbox"
                                                         checked={tooth.extraction}
@@ -314,6 +325,7 @@ export default function PatientsPage({params}: { params: { slug: string } }) {
                                                     />
                                                     <p className="text-xs">Extraction</p>
                                                 </div>
+                                                
                                                 <input
                                                     type="checkbox"
                                                     checked={tooth.filling}
@@ -368,9 +380,18 @@ export default function PatientsPage({params}: { params: { slug: string } }) {
                                                             implant: e.target.checked,
                                                         } : t),
                                                     })}
-                                                />
+                                                /> */}
                                             </div>
                                         ))}
+                                        {showSelectedToothOptions && selectedTooth !== null && (
+                                                    <div>
+                                                        Dziala
+                                                        
+                                                        <button onClick={() => {
+                                                            setShowSelectedToothOptions(false);
+                                                        }}>Wylacz</button>
+                                                        </div>
+                                                )}
                                     </div>
                                 </div>
                             </div>
