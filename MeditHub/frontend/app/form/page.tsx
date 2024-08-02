@@ -74,6 +74,15 @@ async function deleteOrder(orderId: string, patientId: string, session: Session)
     });
 }
 
+async function deletePatient(patientId: string): Promise<Response> {
+    return await fetch(`http://localhost:8080/api/users/deletePatient/${patientId}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+}
+
 
 export default function PatientsPage({params}: { params: { slug: string } }) {
     const creationToothArray = () => {
@@ -170,7 +179,20 @@ export default function PatientsPage({params}: { params: { slug: string } }) {
     }
 
     const handleShowToothForm = () => {
+        if(showToothForm){
+            setSelectedTooth(null)
+        }
         setShowToothForm(!showToothForm);
+    }
+
+    const handleDeletePatient = async (patientId: string) => {
+        try {
+            await deletePatient(patientId);
+            setSelectedPatientId(null)
+            setPatients(await fetchPatients());
+        } catch (error) {
+            console.error('Error deleting user', error);
+        }
     }
 
     
@@ -244,6 +266,7 @@ export default function PatientsPage({params}: { params: { slug: string } }) {
                     <h2 className="text-xl font-semibold mb-2">Patients List</h2>
                     <ul>
                         {patients.map((patient) => (
+                            <div className='flex'>
                             <li
                                 key={patient.id}
                                 onClick={() => {
@@ -252,11 +275,23 @@ export default function PatientsPage({params}: { params: { slug: string } }) {
                                 }}
                                 className={`"cursor-pointer p-2 border-b border-gray-200 hover:bg-gray-100 ${selectedPatientId === patient.id ? 'bg-gray-200' : ''}`}
                             >
-                                <h3 className="text-lg font-semibold">{patient.name}</h3>
+                              <div className='flex'>  
+                                <h3 className="text-lg font-semibold">{patient.name}</h3>  
+                                {selectedPatientId && (
+                                 <p>
+                                 <button className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600' onClick={() => {handleDeletePatient(patient.id)}}>
+                                      Delete Patient
+                                  </button> 
+                              </p>
+                            )}
+                            </div>
                                 <p>{patient.phoneNumber}</p>
                                 <p>{patient.email}</p>
                                 <p>{patient.dateOfBirth}</p>
                             </li>
+                            
+                           
+                            </div>
                         ))}
                     </ul>
                 </div>
@@ -311,85 +346,119 @@ export default function PatientsPage({params}: { params: { slug: string } }) {
                                                 
                                                 }}>{tooth.number}</button>
                                                 
-                                                {/* <div className="flex">
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={tooth.extraction}
-                                                        onChange={(e) => setNewOrder({
-                                                            ...newOrder,
-                                                            toothArray: newOrder.toothArray.map(t => t.number === tooth.number ? {
-                                                                ...t,
-                                                                extraction: e.target.checked,
-                                                            } : t),
-                                                        })}
-                                                    />
-                                                    <p className="text-xs">Extraction</p>
-                                                </div>
                                                 
-                                                <input
-                                                    type="checkbox"
-                                                    checked={tooth.filling}
-                                                    onChange={(e) => setNewOrder({
-                                                        ...newOrder,
-                                                        toothArray: newOrder.toothArray.map(t => t.number === tooth.number ? {
-                                                            ...t,
-                                                            filling: e.target.checked,
-                                                        } : t),
-                                                    })}
-                                                />
-                                                <input
-                                                    type="checkbox"
-                                                    checked={tooth.cleaning}
-                                                    onChange={(e) => setNewOrder({
-                                                        ...newOrder,
-                                                        toothArray: newOrder.toothArray.map(t => t.number === tooth.number ? {
-                                                            ...t,
-                                                            cleaning: e.target.checked,
-                                                        } : t),
-                                                    })}
-                                                />
-                                                <input
-                                                    type="checkbox"
-                                                    checked={tooth.rootCanal}
-                                                    onChange={(e) => setNewOrder({
-                                                        ...newOrder,
-                                                        toothArray: newOrder.toothArray.map(t => t.number === tooth.number ? {
-                                                            ...t,
-                                                            rootCanal: e.target.checked,
-                                                        } : t),
-                                                    })}
-                                                />
-                                                <input
-                                                    type="checkbox"
-                                                    checked={tooth.crown}
-                                                    onChange={(e) => setNewOrder({
-                                                        ...newOrder,
-                                                        toothArray: newOrder.toothArray.map(t => t.number === tooth.number ? {
-                                                            ...t,
-                                                            crown: e.target.checked,
-                                                        } : t),
-                                                    })}
-                                                />
-                                                <input
-                                                    type="checkbox"
-                                                    checked={tooth.implant}
-                                                    onChange={(e) => setNewOrder({
-                                                        ...newOrder,
-                                                        toothArray: newOrder.toothArray.map(t => t.number === tooth.number ? {
-                                                            ...t,
-                                                            implant: e.target.checked,
-                                                        } : t),
-                                                    })}
-                                                /> */}
                                             </div>
                                         ))}
                                         {showSelectedToothOptions && selectedTooth !== null && (
                                                     <div>
                                                         Dziala
-                                                        
+                                                        <div className='flex'> 
+                                                            
+                                                        <input type="checkbox" checked={selectedTooth.extraction} onChange={(e) => {
+                                                            const updatedTooth = {
+                                                                ...selectedTooth,
+                                                                extraction: e.target.checked,
+                                                            };
+                                                            setSelectedTooth(updatedTooth);
+                                                            setNewOrder({
+                                                                ...newOrder,
+                                                                toothArray: newOrder.toothArray.map(t => 
+                                                                t.number === selectedTooth.number ? updatedTooth : t
+                                                                ),
+                                                            });
+                                                        }}  />
+                                                        <p>
+                                                        Extraction
+                                                        </p>
+                                                        </div>
+                                                        <div className='flex'>
+                                                        <input type="checkbox" checked={selectedTooth.filling} onChange={(e) => {
+                                                            const updatedTooth = {
+                                                                ...selectedTooth,
+                                                                filling: e.target.checked,
+                                                            }
+                                                            setSelectedTooth(updatedTooth);
+                                                            setNewOrder({
+                                                                ...newOrder,
+                                                                toothArray: newOrder.toothArray.map(t =>
+                                                                    t.number === selectedTooth.number ? updatedTooth : t
+                                                                ),
+                                                            })
+                                                        }} />
+                                                        <p>Filling</p>
+                                                        </div>
+
+                                                        <div className='flex'>
+                                                        <input type="checkbox" checked={selectedTooth.cleaning} onChange={(e) => {
+                                                            const updatedTooth = {
+                                                                ...selectedTooth,
+                                                                cleaning: e.target.checked,
+                                                            }
+                                                            setSelectedTooth(updatedTooth);
+                                                            setNewOrder({
+                                                                ...newOrder,
+                                                                toothArray: newOrder.toothArray.map(t =>
+                                                                    t.number === selectedTooth.number ? updatedTooth : t
+                                                                ),
+                                                            })
+                                                        }} />
+                                                        <p>Cleaning</p>
+                                                        </div>
+                                                        <div className='flex'>
+                                                        <input type="checkbox" checked={selectedTooth.rootCanal} onChange={(e) => {
+                                                            const updatedTooth = {
+                                                                ...selectedTooth,
+                                                                rootCanal: e.target.checked,
+                                                            }
+                                                            setSelectedTooth(updatedTooth);
+                                                            setNewOrder({
+                                                                ...newOrder,
+                                                                toothArray: newOrder.toothArray.map( t=>
+                                                                    t.number === selectedTooth.number ? updatedTooth : t
+                                                                ),
+                                                            })
+                                                        }} />
+                                                        <p>rootCanal</p>
+                                                        </div>
+
+                                                        <div className='flex'>
+                                                        <input type="checkbox" checked={selectedTooth.crown} onChange={(e) => {
+                                                            const updatedTooth = {
+                                                                ...selectedTooth,
+                                                                crown: e.target.checked,
+                                                            }
+                                                            setSelectedTooth(updatedTooth)
+                                                            setNewOrder({
+                                                                ...newOrder,
+                                                                toothArray: newOrder.toothArray.map(t =>
+                                                                    t.number === selectedTooth.number ? updatedTooth : t
+                                                                ),
+                                                            })
+                                                        }} />
+                                                        <p>Crown</p>
+                                                        </div>
+
+
+                                                        <div className='flex'>
+                                                        <input type="checkbox" checked={selectedTooth.implant} onChange={(e) => {
+                                                            const updatedTooth = {
+                                                                ...selectedTooth,
+                                                                implant: e.target.checked,
+                                                            }
+                                                            setSelectedTooth(updatedTooth)
+                                                            setNewOrder({
+                                                                ...newOrder,
+                                                                toothArray: newOrder.toothArray.map(t => 
+                                                                    t.number === selectedTooth.number ? updatedTooth : t
+                                                                ),
+                                                            })
+                                                        }} />
+                                                        <p>Implant</p>
+                                                        </div>
                                                         <button onClick={() => {
                                                             setShowSelectedToothOptions(false);
-                                                        }}>Wylacz</button>
+                                                            setSelectedTooth(null);
+                                                        }}>Quit</button>
                                                         </div>
                                                 )}
                                     </div>

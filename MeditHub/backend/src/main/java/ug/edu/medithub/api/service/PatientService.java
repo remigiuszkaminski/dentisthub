@@ -118,6 +118,27 @@ public class PatientService {
         }
     }
 
+    public ResponseEntity<String> deletePatient (String patientId) {
+        try {
+            Optional<Patient> patientOptional = patientRepository.findById(patientId);
+
+            if (patientOptional.isEmpty()) {
+                return new ResponseEntity<>("Patient not found", HttpStatus.NOT_FOUND);
+            }
+
+            Patient patient = patientOptional.get();
+
+            patientRepository.deleteById(patient.getId());
+            return new ResponseEntity<>("Patient Deleted", HttpStatus.OK);
+
+
+
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Deletion failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
 
 }

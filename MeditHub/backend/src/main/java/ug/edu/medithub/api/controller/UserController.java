@@ -77,6 +77,11 @@ public class UserController {
         return patientService.addPatient(patient);
     }
 
+    @DeleteMapping("/deletePatient/{patientId}")
+    public ResponseEntity<String> deletePatient(@PathVariable String patientId) {
+        return patientService.deletePatient(patientId);
+    }
+
     @PostMapping("/addOrder/{patientId}")
     public ResponseEntity<String> addOrderForPatient(@PathVariable String patientId, @RequestBody Order order, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         return patientService.addOrderForPatient(patientId, order, authorizationHeader);
@@ -86,5 +91,7 @@ public class UserController {
     public ResponseEntity<String> deleteOrderFromPatient(@PathVariable String orderId, @PathVariable String patientName, @RequestHeader(HttpHeaders.AUTHORIZATION) String authorizationHeader) {
         return patientService.deleteOrderFromPatient(orderId, patientName, authorizationHeader);
     }
+
+
 
 }
