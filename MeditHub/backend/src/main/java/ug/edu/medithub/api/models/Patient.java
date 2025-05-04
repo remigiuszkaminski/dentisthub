@@ -77,6 +77,15 @@ public class Patient {
         this.orders.add(order);
     }
 
+    public void editOrder(Order order) {
+        for (int i = 0; i < orders.size(); i++) {
+            if (orders.get(i).getId().equals(order.getId())) {
+                orders.set(i, order);
+                return;
+            }
+        }
+    }
+
     @Override
     public String toString() {
         return "Patient{" +

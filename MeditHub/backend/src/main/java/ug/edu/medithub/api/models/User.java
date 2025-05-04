@@ -1,7 +1,7 @@
 package ug.edu.medithub.api.models;
 
 
-
+import java.util.ArrayList;
 
 public class User {
 
@@ -13,6 +13,7 @@ public class User {
 
     private String profilePicture;
     private String description;
+
 
     public void setId(String id) {
         this.id = id;

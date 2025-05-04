@@ -12,6 +12,7 @@ import ug.edu.medithub.api.models.Patient;
 import ug.edu.medithub.api.repository.PatientRepository;
 
 import java.security.Key;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -32,14 +33,13 @@ public class PatientService {
     }
 
     public List<Patient> getAllPatients() {
-        List<Patient> patients = patientRepository.findAll();
-        return patients;
+        return patientRepository.findAll();
     }
 
     public ResponseEntity<String> addPatient(Patient patient) {
         try {
             List<Patient> patientOptional = patientRepository.findByEmail(patient.getEmail());
-            if (patientOptional.size() > 0) {
+            if (!patientOptional.isEmpty()) {
                 return new ResponseEntity<>("PATIENT ARLEADY EXISTS", HttpStatus.CONFLICT);
             }
             patientRepository.save(patient);
@@ -137,6 +137,92 @@ public class PatientService {
         } catch (Exception e) {
             return new ResponseEntity<>("Deletion failed", HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public ResponseEntity<String> updatePatient (String patientId, Patient patient) {
+        try {
+            Optional<Patient> optionalPatient = patientRepository.findById(patientId);
+
+            if(optionalPatient.isEmpty()) {
+                return new ResponseEntity<>("Patient not found", HttpStatus.NOT_FOUND);
+            }
+
+            Patient patientToUpdate = optionalPatient.get();
+
+            patientToUpdate.setEmail(patient.getEmail());
+            patientToUpdate.setName(patient.getName());
+            patientToUpdate.setEmail(patient.getEmail());
+            patientToUpdate.setDateOfBirth(patient.getDateOfBirth());
+            patientToUpdate.setDateOfBirth(patient.getDateOfBirth());
+
+            patientRepository.save(patientToUpdate);
+
+            return new ResponseEntity<>("Patient updated sucessfully", HttpStatus.OK);
+
+
+
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Update failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public ResponseEntity<String> editOrder(String patientId, Patient patient, String orderId, Order orderTo) {
+        try {
+            Optional<Patient> optionalPatient = patientRepository.findById(patientId);
+
+            if (optionalPatient.isEmpty()) {
+                return new ResponseEntity<>("Patient not found", HttpStatus.NOT_FOUND);
+            }
+            Patient patientToUpdate = optionalPatient.get();
+            List<Order> orders = patientToUpdate.getOrders();
+            Optional<Order> optionalOrder = orders.stream().filter(order -> order.getId().equals(orderId)).findFirst();
+            if (optionalOrder.isEmpty()) {
+                return new ResponseEntity<>("Order not found", HttpStatus.NOT_FOUND);
+            }
+
+            Order orderToUpdate = optionalOrder.get();
+
+            orderToUpdate.setDate(orderTo.getDate());
+            orderToUpdate.setDescription(orderTo.getDescription());
+            orderToUpdate.setTime(orderTo.getTime());
+            orderToUpdate.setDoctorName(orderTo.getDoctorName());
+            orderToUpdate.setToothArray(orderTo.getToothArray());
+
+            patientToUpdate.editOrder(orderToUpdate);
+
+            patientRepository.save(patientToUpdate);
+
+            String subject = "Zmiana terminu wizyty u doktora";
+            String text = getString(orderToUpdate, patientToUpdate);
+
+            emailSenderService.sendEmail(patientToUpdate.getEmail(), subject, text);
+
+            return new ResponseEntity<>("Order edited successfully", HttpStatus.OK);
+
+
+
+
+        } catch (Exception e) {
+            return new ResponseEntity<>("Order edition failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private static String getString(Order orderToUpdate, Patient patientToUpdate) {
+        String doctorName = orderToUpdate.getDoctorName();
+        String date = orderToUpdate.getDate();
+        String time = orderToUpdate.getTime();
+        String description = orderToUpdate.getDescription();
+
+        return "Witaj, " + patientToUpdate.getName() + "!\n\n" +
+                "Informujemy, że wizyta u doktora " + doctorName + " została zmieniona.\n" +
+                "Nowa data: " + date + "\n" +
+                "Nowa godzina: " + time + "\n" +
+                "Nowy opis: " + description + "\n\n" +
+                "Pamiętaj o punktualności!\n\n" +
+                "Pozdrawiamy,\n" +
+                "Zespół MeditHub";
     }
 
 

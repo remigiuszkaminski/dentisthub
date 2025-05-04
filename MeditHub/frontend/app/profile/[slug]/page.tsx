@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import Link from 'next/link';
+import React from 'react';
 
 interface FoundUser {
     username: string;
@@ -28,7 +29,7 @@ async function getUser(slug: string): Promise<FoundUser> {
 
 export default function ProfilePage({ params }: { params: { slug: string } }) {
     const { data: session } = useSession();
-    const { slug } = params;
+    const { slug } = React.use(params);
 
     const [foundUser, setFoundUser] = useState<FoundUser | null>(null);
 

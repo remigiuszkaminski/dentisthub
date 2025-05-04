@@ -92,6 +92,11 @@ public class UserController {
         return patientService.deleteOrderFromPatient(orderId, patientName, authorizationHeader);
     }
 
+    @PutMapping("/updatePatient/{patientId}")
+    public ResponseEntity<String> updatePatient(@PathVariable String patientId, @RequestBody Patient patient) {
+        return patientService.updatePatient(patientId, patient);
+    }
+
 
 
 }
